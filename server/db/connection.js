@@ -9,6 +9,8 @@ const client = new MongoClient(URI, {
   },
 });
 
+console.log("Trying to connect to mongodb atlas...")
+
 try {
   // Connect the client to the server
   await client.connect();
