@@ -5,10 +5,9 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-// import Record from "./components/Record";
 import Tournament from "./components/Tournament";
-// import Tournament from "./components/RecordList";
 import TournamentList from "./components/TournamentList";
+import AnswerList from "./components/AnswerList";
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -19,6 +18,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <TournamentList />,
+      },
+      {
+        path: "/answers",
+        element: <AnswerList />,
       },
     ],
   },
