@@ -1,5 +1,14 @@
 This application can be used to organize job tournaments.
 
+TODO:
+
+Fix the navbar after logon
+
+Logon/register curl example
+curl -X POST http://localhost:5050/auth/login \   
+     -H "Content-Type: application/json" \
+     -d '{"username":"testuser1", "password":"testpassword1"}'
+
 Example:
 John wants to play "Guess the score" for EURO tournament.
 He creates an table and/or excel sheet for players

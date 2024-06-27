@@ -1,4 +1,4 @@
-// src/useAuth.js
+// idk if this is correct
 import { useState, useEffect } from 'react';
 
 const useAuth = () => {
