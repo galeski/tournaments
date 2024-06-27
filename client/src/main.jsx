@@ -7,6 +7,7 @@ import {
 import App from "./App";
 import Tournament from "./components/Tournament";
 import TournamentList from "./components/TournamentList";
+import TournamentView from "./components/TournamentView";
 import AnswerList from "./components/AnswerList";
 import "./index.css";
 
@@ -42,6 +43,16 @@ const router = createBrowserRouter([
       {
         path: "/edit/:id",
         element: <Tournament />,
+      },
+    ],
+  },
+  {
+    path: "/view/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/view/:id",
+        element: <TournamentView />,
       },
     ],
   },
