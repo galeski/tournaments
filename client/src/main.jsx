@@ -3,13 +3,24 @@ import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
 } from "react-router-dom";
 import App from "./App";
 import Tournament from "./components/Tournament";
 import TournamentList from "./components/TournamentList";
 import TournamentView from "./components/TournamentView";
 import AnswerList from "./components/AnswerList";
+import Login from "./components/Login";
 import "./index.css";
+
+// ProtectedRoute component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 const router = createBrowserRouter([
   {
@@ -18,11 +29,15 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <TournamentList />,
+        element: <ProtectedRoute><TournamentList /></ProtectedRoute>,
       },
       {
         path: "/answers",
-        element: <AnswerList />,
+        element: <ProtectedRoute><AnswerList /></ProtectedRoute>,
+      },
+      {
+        path: "/login",
+        element: <Login />,
       },
     ],
   },
@@ -32,7 +47,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/create",
-        element: <Tournament />,
+        element: <ProtectedRoute><Tournament /></ProtectedRoute>,
       },
     ],
   },
@@ -42,7 +57,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/edit/:id",
-        element: <Tournament />,
+        element: <ProtectedRoute><Tournament /></ProtectedRoute>,
       },
     ],
   },
@@ -52,7 +67,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/view/:id",
-        element: <TournamentView />,
+        element: <ProtectedRoute><TournamentView /></ProtectedRoute>,
       },
     ],
   },
