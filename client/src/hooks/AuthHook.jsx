@@ -11,6 +11,7 @@ const useAuth = () => {
 
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
+    console.log("whyy")
     setIsLoggedIn(true);
   };
 

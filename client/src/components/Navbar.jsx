@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
+
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, handleLogin, handleLogout } = useAuthContext();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-  }, []);
+    if (token && !isLoggedIn) {
+      handleLogin(token);
+    }
+    if (!token && !isLoggedIn) {
+      handleLogout();
+      navigate('/login');
+    }
+  }, [navigate, isLoggedIn, handleLogin, handleLogout]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    navigate('/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   // setIsLoggedIn(false);
+  //   isLoggedIn = false;
+  //   
+  // };
 
   return (
     <div>
@@ -23,7 +33,7 @@ export default function Navbar() {
           {/* <img alt="Tournaments logo" className="h-10 inline" src=""></img> */}
           Tournaments
         </NavLink>
-        
+
         {isLoggedIn ? (
           <div className="flex space-x-2">
             <NavLink 
