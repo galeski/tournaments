@@ -1,8 +1,10 @@
 // idk if this is correct
 import { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from "react-router-dom"
 
 const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn,] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -11,13 +13,13 @@ const useAuth = () => {
 
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
-    console.log("whyy")
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
+    navigate('/login');
   };
 
   return {

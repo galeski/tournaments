@@ -15,7 +15,7 @@ export default function Navbar() {
     }
     if (!token && !isLoggedIn) {
       handleLogout();
-      navigate('/login');
+      // navigate('/login');
     }
   }, [navigate, isLoggedIn, handleLogin, handleLogout]);
 
