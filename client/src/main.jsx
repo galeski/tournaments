@@ -11,6 +11,7 @@ import TournamentList from "./components/TournamentList";
 import TournamentView from "./components/TournamentView";
 import AnswerList from "./components/AnswerList";
 import Login from "./components/Login";
+import Register from './components/Register';
 import "./index.css";
 
 // ProtectedRoute component
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
       },
     ],
   },
