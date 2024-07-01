@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 
 
 export default function Navbar() {
-  const navigate = useNavigate();
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isLoggedIn, handleLogin, handleLogout } = useAuthContext();
 
@@ -17,7 +16,7 @@ export default function Navbar() {
       handleLogout();
       // navigate('/login');
     }
-  }, [navigate, isLoggedIn, handleLogin, handleLogout]);
+  }, [isLoggedIn, handleLogin, handleLogout]);
 
   // const handleLogout = () => {
   //   localStorage.removeItem('token');
