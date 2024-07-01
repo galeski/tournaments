@@ -33,6 +33,30 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const query = { _id: new ObjectId(req.params.id) };
+    const updates = {
+      $set: {
+        title: req.body.title,
+        questions: req.body.questions
+      }
+    };
+    
+    let collection = await db.collection("tournaments");
+    let result = await collection.updateOne(query, updates);
+    
+    if (result.matchedCount === 0) {
+      res.status(404).send("Tournament not found");
+    } else {
+      res.status(200).send("Tournament updated successfully");
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error updating tournament");
+  }
+});
+
 router.delete("/:id", async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) };

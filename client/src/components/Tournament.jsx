@@ -47,25 +47,31 @@ export default function Tournament() {
           body: JSON.stringify(tournament),
         });
       } else {
-        // Note: The backend doesn't have a PATCH route, so we're not implementing update functionality
-        console.warn("Update functionality not implemented in the backend");
-        return;
+        response = await fetch(`http://localhost:5050/tournaments/${tournament._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(tournament),
+        });
       }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } catch (error) {
-      console.error('A problem occurred adding a tournament: ', error);
-    } finally {
+
+      // If we reach here, the submission was successful
       setForm({ title: "", questions: [] });
       navigate("/");
+    } catch (error) {
+      console.error('A problem occurred managing the tournament: ', error);
+      // You might want to show an error message to the user here
     }
   }
 
   return (
     <>
-      <h3 className="text-lg font-semibold p-4">Create Tournament</h3>
+      <h3 className="text-lg font-semibold p-4">
+        {isNew ? "Create Tournament" : "Edit Tournament"}
+      </h3>
       <form onSubmit={onSubmit} className="border rounded-lg overflow-hidden p-4">
         <div className="grid grid-cols-1 gap-y-10 border-b border-slate-900/10 pb-12">
           <div>
@@ -109,7 +115,7 @@ export default function Tournament() {
         </div>
         <input
           type="submit"
-          value="Save Tournament"
+          value={isNew ? "Create Tournament" : "Update Tournament"}
           className="mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         />
       </form>
