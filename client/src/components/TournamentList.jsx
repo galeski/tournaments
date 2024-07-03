@@ -164,7 +164,7 @@ export default function TournamentList() {
           </div>
         </div>
       ) : (
-        <div className="border rounded-lg"></div>
+        <div className="border rounded-lg">No tournaments added.</div>
       )}
     </>
   );

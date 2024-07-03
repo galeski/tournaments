@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { isLoggedIn, handleLogin, handleLogout } = useAuthContext();
@@ -11,7 +11,7 @@ export default function Navbar() {
       const token = localStorage.getItem('token');
       if (token && !isLoggedIn) {
         handleLogin(token);
-        toast('User logged in.', {icon: '✅'});
+        toast('User logged in.', {icon: '✅', id: 'logon'});
       } else if (!token && isLoggedIn) {
         handleLogout();
       }
@@ -22,7 +22,6 @@ export default function Navbar() {
 
   return (
     <div>
-      <Toaster />
       <nav className="flex justify-between items-center mb-6">
         <NavLink to="/">
           Tournaments
