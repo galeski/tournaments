@@ -150,7 +150,7 @@ export default function TournamentList() {
                     Title
                   </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
-                    Number of Questions
+                    No of Questions
                   </th>
                   <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                     Action
@@ -164,7 +164,7 @@ export default function TournamentList() {
           </div>
         </div>
       ) : (
-        <div className="border rounded-lg">No tournaments added.</div>
+        <div className="border rounded-lg px-4">No tournaments added.</div>
       )}
     </>
   );
