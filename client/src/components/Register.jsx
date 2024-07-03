@@ -24,6 +24,7 @@ function Register() {
 
       const data = await response.json();
       localStorage.setItem('token', data.token);
+      // localStorage.setItem('username', username);
 
       // Redirect to login page or update app state
       navigate('/login');

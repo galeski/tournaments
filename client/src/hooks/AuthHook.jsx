@@ -1,6 +1,6 @@
 // idk if this is correct
 import { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 
 const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn,] = useState(false);
