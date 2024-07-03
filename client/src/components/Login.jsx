@@ -23,6 +23,7 @@ function Login() {
 
       const data = await response.json();
       localStorage.setItem('token', data.token);
+      // localStorage.setItem('username', username);
 
       // Redirect to protected route or update app state
       navigate('/');

@@ -11,8 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/tournaments", tournaments);
 app.use("/answer", answer);
-// we have /auth/register and /auth/login
-app.use("/auth", auth);
+app.use("/auth", auth); // we have /auth/register and /auth/login
 
 // start the Express server
 app.listen(PORT, () => {

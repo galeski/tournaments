@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 export default function Tournament() {
   const [form, setForm] = useState({
     title: "",
-    questions: [],
+    questions: []
   });
   const [isNew, setIsNew] = useState(true);
   const params = useParams();
@@ -43,13 +43,19 @@ export default function Tournament() {
       if (isNew) {
         response = await fetch("http://localhost:5050/tournaments", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+          },
           body: JSON.stringify(tournament),
         });
       } else {
         response = await fetch(`http://localhost:5050/tournaments/${tournament._id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+          },
           body: JSON.stringify(tournament),
         });
       }

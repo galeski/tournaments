@@ -72,37 +72,66 @@ export default function TournamentList() {
   const [tournaments, setTournaments] = useState([]);
 
   useEffect(() => {
-    async function getTournaments() {
-      const response = await fetch(`http://localhost:5050/tournaments/`);
-      if (!response.ok) {
-        const message = `An error occurred: ${response.statusText}`;
-        console.error(message);
+    async function getUserTournaments() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found, user must be logged in');
         return;
       }
-      const tournaments = await response.json();
-      setTournaments(tournaments);
+    
+      try {
+        const response = await fetch(`http://localhost:5050/tournaments/user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const tournaments = await response.json();
+        setTournaments(tournaments);
+      } catch (error) {
+        console.error('An error occurred while fetching user tournaments:', error);
+      }
     }
-    getTournaments();
-  }, [tournaments.length]);
+    getUserTournaments();
+  }, []);
 
   async function deleteTournament(id) {
-    await fetch(`http://localhost:5050/tournaments/${id}`, {
-      method: "DELETE",
-    });
-    const newTournaments = tournaments.filter((el) => el._id !== id);
-    setTournaments(newTournaments);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found, user must be logged in');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5050/tournaments/${id}`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      setTournaments(tournaments.filter((el) => el._id !== id));
+    } catch (error) {
+      console.error('An error occurred while deleting the tournament:', error);
+    }
   }
 
   function tournamentList() {
-    return tournaments.map((tournament) => {
-      return (
-        <Tournament
-          tournament={tournament}
-          deleteTournament={() => deleteTournament(tournament._id)}
-          key={tournament._id}
-        />
-      );
-    });
+    return tournaments.map((tournament) => (
+      <Tournament
+        tournament={tournament}
+        deleteTournament={() => deleteTournament(tournament._id)}
+        key={tournament._id}
+      />
+    ));
   }
 
   return (
@@ -135,7 +164,7 @@ export default function TournamentList() {
           </div>
         </div>
       ) : (
-        <div className="border rounded-lg px-4">No tournaments found.</div>
+        <div className="border rounded-lg">No tournaments added.</div>
       )}
     </>
   );
