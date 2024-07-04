@@ -1,125 +1,96 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 
-const Answer = ({ answer, deleteAnswer }) => (
-  <li className="border-b py-2">
-    <p><strong>User:</strong> {answer.user}</p>
-    <p><strong>Answer:</strong> {answer.answer}</p>
-    <p><strong>Tournament ID:</strong> {answer.tournamentId}</p>
-    <button 
-      onClick={() => deleteAnswer(answer._id)}
-      className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-    >
-      Delete
-    </button>
-  </li>
-);
-
-export default function AnswerList() {
+const AnswerList = () => {
+  const { id } = useParams();
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newAnswer, setNewAnswer] = useState({ tournamentId: '', user: '', answer: '' });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchAnswers = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setError('No token found, user must be logged in');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5050/answer`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const allAnswers = await response.json();
+
+        console.log(allAnswers)
+        
+        // Filter answers for the specific tournament
+        const tournamentAnswers = allAnswers.filter(answer => answer.tournamentId === id);
+        
+        setAnswers(tournamentAnswers);
+        setLoading(false);
+      } catch (error) {
+        console.error('An error occurred while fetching answers:', error);
+        setError('Failed to fetch answers');
+        setLoading(false);
+      }
+    };
+
     fetchAnswers();
-  }, []);
+  }, [id]);
 
-  async function fetchAnswers() {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:5050/answer');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      setAnswers(data);
-    } catch (error) {
-      console.error("Could not fetch answers:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function addAnswer(e) {
-    e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:5050/answer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newAnswer),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      setNewAnswer({ tournamentId: '', user: '', answer: '' });
-      fetchAnswers();
-    } catch (error) {
-      console.error("Could not add answer:", error);
-    }
-  }
-
-  async function deleteAnswer(id) {
-    try {
-      const response = await fetch(`http://localhost:5050/answer/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      fetchAnswers();
-    } catch (error) {
-      console.error("Could not delete answer:", error);
-    }
-  }
-
-  if (loading) {
-    return <div>Loading answers...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Answers</h1>
-      
-      <form onSubmit={addAnswer} className="mb-4">
-        <input
-          type="text"
-          placeholder="Tournament ID"
-          value={newAnswer.tournamentId}
-          onChange={(e) => setNewAnswer({...newAnswer, tournamentId: e.target.value})}
-          className="border p-2 mr-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="User"
-          value={newAnswer.user}
-          onChange={(e) => setNewAnswer({...newAnswer, user: e.target.value})}
-          className="border p-2 mr-2"
-          required
-        />
-        <input
-          type="text"
-          placeholder="Answer"
-          value={newAnswer.answer}
-          onChange={(e) => setNewAnswer({...newAnswer, answer: e.target.value})}
-          className="border p-2 mr-2"
-          required
-        />
-        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Add Answer
-        </button>
-      </form>
-
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Answers for Tournament {id}</h2>
       {answers.length > 0 ? (
-        <ul>
-          {answers.map((answer) => (
-            <Answer key={answer._id} answer={answer} deleteAnswer={deleteAnswer} />
-          ))}
-        </ul>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">User</th>
+              <th className="border p-2">Answer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {answers.map((answer, index) => (
+              <tr key={index} className="border-b">
+                <td className="border p-2">{answer.user}</td>
+                <td className="border p-2">
+                  {answer.answer && typeof answer.answer === 'object' ? (
+                    Object.entries(answer.answer).map(([questionIndex, answerPair], idx) => (
+                      <div key={idx}>
+                        <strong>Q{parseInt(questionIndex) + 1}:</strong> 
+                        {answerPair.answer1}:{answerPair.answer2}
+                      </div>
+                    ))
+                  ) : (
+                    <span>Invalid answer format</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       ) : (
-        <p>No answers available.</p>
+        <p>No answers submitted for this tournament yet.</p>
       )}
+      <Link
+        to="/"
+        className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Go back
+      </Link>
     </div>
   );
-}
+};
+
+export default AnswerList;

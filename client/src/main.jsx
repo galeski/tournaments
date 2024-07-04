@@ -9,6 +9,7 @@ import App from "./App";
 import Tournament from "./components/Tournament";
 import TournamentList from "./components/TournamentList";
 import TournamentView from "./components/TournamentView";
+import Answer from './components/Answer';
 import AnswerList from "./components/AnswerList";
 import Login from "./components/Login";
 import Register from './components/Register';
@@ -73,6 +74,27 @@ const router = createBrowserRouter([
       {
         path: "/view/:id",
         element: <ProtectedRoute><TournamentView /></ProtectedRoute>,
+      },
+    ],
+  },
+  // maybe I should add a more robust solution here
+  {
+    path: "/answer/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/answer/:id",
+        element: <Answer />,
+      },
+    ],
+  },
+  {
+    path: "/answers/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/answers/:id",
+        element: <ProtectedRoute><AnswerList /></ProtectedRoute>,
       },
     ],
   },

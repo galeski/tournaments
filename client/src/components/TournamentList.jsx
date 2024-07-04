@@ -13,11 +13,14 @@ const hashCode = (str) => {
 }
 
 const Tournament = (props) => {
-  const hashedLink = `${window.location.origin}/tournaments/${hashCode(props.tournament._id)}`;
+  // const hashedLink = `${window.location.origin}/tournaments/${hashCode(props.tournament._id)}`;
+  // for now I will use non-hashed link
+  const hashedLink = `${window.location.origin}/answer/${props.tournament._id}`;
 
   const copyHashedLink = () => {
     navigator.clipboard.writeText(hashedLink).then(() => {
-      alert("Hashed link copied to clipboard!");
+      // alert("Hashed link copied to clipboard!");
+      alert("Link copied to clipboard!");
     });
   };
 
@@ -45,6 +48,12 @@ const Tournament = (props) => {
             to={`/edit/${props.tournament._id}`}
           >
             Edit
+          </Link>
+          <Link
+            className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3"
+            to={`/answers/${props.tournament._id}`}
+          >
+            View Answers
           </Link>
           <button
             className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-slate-100 h-9 rounded-md px-3"
