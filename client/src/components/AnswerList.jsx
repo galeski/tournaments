@@ -7,6 +7,7 @@ const AnswerList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [tournamentTitle, setTournamentTitle] = useState();
 
   useEffect(() => {
     fetchAnswers();
@@ -29,8 +30,10 @@ const AnswerList = () => {
 
       const tournament = await(await fetch(`http://localhost:5050/tournaments/${id}`)).json();
       const tournamentQuestions = tournament.questions;
+      const tournamentTitle = tournament.title;
       
       setQuestions(tournamentQuestions);
+      setTournamentTitle(tournamentTitle);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -83,7 +86,7 @@ const AnswerList = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Answers for Tournament {id}</h2>
+      <h2 className="text-2xl font-bold mb-4">Answers for Tournament "{tournamentTitle}" ({id})</h2>
       {answers.length > 0 ? (
         <table className="w-full border-collapse">
           <thead>
