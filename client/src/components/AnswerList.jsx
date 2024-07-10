@@ -6,6 +6,7 @@ const AnswerList = () => {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     const fetchAnswers = async () => {
@@ -22,6 +23,11 @@ const AnswerList = () => {
             'Authorization': `Bearer ${token}`
           }
         });
+
+        const tournament = await(await fetch(`http://localhost:5050/tournaments/${id}`)).json();
+        const tournamentQuestions = tournament.questions;
+        
+        setQuestions(tournamentQuestions);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -66,10 +72,9 @@ const AnswerList = () => {
                 <td className="border p-2">{answer.user}</td>
                 <td className="border p-2">
                   {answer.answer && typeof answer.answer === 'object' ? (
-                    Object.entries(answer.answer).map(([questionIndex, answerPair], idx) => (
+                    questions.map((question, idx) => (
                       <div key={idx}>
-                        <strong>Q{parseInt(questionIndex) + 1}:</strong> 
-                        {answerPair.answer1}:{answerPair.answer2}
+                        <strong>{question}:</strong> {answer.answer[idx]?.answer1}:{answer.answer[idx]?.answer2}
                       </div>
                     ))
                   ) : (
