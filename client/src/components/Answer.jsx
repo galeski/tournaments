@@ -10,6 +10,7 @@ const Answer = () => {
   const [answers, setAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -54,15 +55,15 @@ const Answer = () => {
     e.preventDefault();
     setSubmitting(true);
     setSubmitError(null);
-
+  
     const submissionData = {
       tournamentId: id,
       user: username,
       answer: answers
     };
-
+  
     console.log('Submission data:', submissionData);
-
+  
     try {
       const response = await fetch(`http://localhost:5050/answer`, {
         method: 'POST',
@@ -71,13 +72,13 @@ const Answer = () => {
         },
         body: JSON.stringify(submissionData),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Submission failed: ${response.statusText}`);
       }
-
-      // Handle successful submission
-      alert('Answers submitted successfully!');
+  
+      // Set submission success to true
+      setSubmissionSuccess(true);
     } catch (error) {
       console.error('Submission error:', error);
       setSubmitError(error.message);
@@ -90,6 +91,15 @@ const Answer = () => {
   if (error) return <div>Error: {error}</div>;
   if (!tournament) return <div>No tournament found</div>;
 
+  if (submissionSuccess) {
+    return (
+      <div className="p-4">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Thank you for submitting your answer!</strong>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">{tournament.title}</h1>
