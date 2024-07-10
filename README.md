@@ -1,7 +1,7 @@
 This application can be used to organize work tournaments (for example football
 scoring matches).
 
-WIP - this repo is a work in progress
+WIP - this repo is a work in progress and the readme is outdated
 
 TODO:
 
