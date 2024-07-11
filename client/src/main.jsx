@@ -13,6 +13,8 @@ import Answer from './components/Answer';
 import AnswerList from "./components/AnswerList";
 import Login from "./components/Login";
 import Register from './components/Register';
+import Score from './components/Score';
+import ScoreView from "./components/ScoreView";
 import "./index.css";
 
 // ProtectedRoute component
@@ -95,6 +97,26 @@ const router = createBrowserRouter([
       {
         path: "/answers/:id",
         element: <ProtectedRoute><AnswerList /></ProtectedRoute>,
+      },
+    ],
+  },
+  {
+    path: "/score/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/score/:id",
+        element: <ProtectedRoute><Score /></ProtectedRoute>,
+      },
+    ],
+  },
+  {
+    path: "/scores/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/scores/:id",
+        element: <ProtectedRoute><ScoreView /></ProtectedRoute>,
       },
     ],
   },
