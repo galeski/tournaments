@@ -45,30 +45,30 @@ router.get('/', async (req, res) => {
       },
       {
         $addFields: {
-          correctAnswers: {
-            $reduce: {
+          answerDetails: {
+            $map: {
               input: "$answerArray",
-              initialValue: 0,
+              as: "ans",
               in: {
-                $add: [
-                  "$$value",
-                  {
-                    $cond: [
-                      {
-                        $eq: [
-                          { $concat: [
-                            { $toString: "$$this.v.answer1" },
-                            ":",
-                            { $toString: "$$this.v.answer2" }
-                          ]},
-                          { $arrayElemAt: ["$scoreArray", { $toInt: "$$this.k" }] }
-                        ]
-                      },
-                      1,
-                      0
-                    ]
-                  }
-                ]
+                questionIndex: { $toInt: "$$ans.k" },
+                userAnswer: { 
+                  $concat: [
+                    { $toString: "$$ans.v.answer1" },
+                    ":",
+                    { $toString: "$$ans.v.answer2" }
+                  ]
+                },
+                correctAnswer: { $arrayElemAt: ["$scoreArray", { $toInt: "$$ans.k" }] },
+                isCorrect: {
+                  $eq: [
+                    { $concat: [
+                      { $toString: "$$ans.v.answer1" },
+                      ":",
+                      { $toString: "$$ans.v.answer2" }
+                    ]},
+                    { $arrayElemAt: ["$scoreArray", { $toInt: "$$ans.k" }] }
+                  ]
+                }
               }
             }
           }
@@ -77,26 +77,29 @@ router.get('/', async (req, res) => {
       {
         $group: {
           _id: "$user",
-          correctAnswers: { $sum: "$correctAnswers" },
-          totalAnswers: { $sum: { $size: "$answerArray" } }
+          answers: { $push: "$answerDetails" },
+          totalCorrect: { 
+            $sum: { 
+              $reduce: {
+                input: "$answerDetails",
+                initialValue: 0,
+                in: { $add: ["$$value", { $cond: ["$$this.isCorrect", 1, 0] }] }
+              }
+            }
+          }
         }
       },
       {
         $project: {
           user: "$_id",
-          correctAnswers: 1,
-          totalAnswers: 1,
-          percentageCorrect: {
-            $multiply: [
-              { $divide: ["$correctAnswers", "$totalAnswers"] },
-              100
-            ]
-          }
+          answers: 1,
+          totalCorrect: 1,
+          totalAnswers: { $size: "$answers" }
         }
       },
-      { $sort: { correctAnswers: -1, percentageCorrect: -1 } },
-      { $limit: 1 }
+      { $sort: { totalCorrect: -1 } }
     ];
+
 
     // Log the pipeline for debugging
     console.log("Aggregation Pipeline:", JSON.stringify(pipeline, null, 2));
@@ -107,9 +110,14 @@ router.get('/', async (req, res) => {
     console.log("Aggregation Result:", JSON.stringify(result, null, 2));
 
     if (result.length > 0) {
+      // Return all user results, sorted by totalCorrect
       res.json({
-        userId: result[0]._id,
-        correctAnswers: result[0].correctAnswers
+        userResults: result.map(user => ({
+          user: user.user,
+          totalCorrect: user.totalCorrect,
+          totalAnswers: user.totalAnswers,
+          answers: user.answers.flat() // Flatten the nested array of answers
+        }))
       });
     } else {
       // Log collection counts
@@ -121,7 +129,7 @@ router.get('/', async (req, res) => {
       res.status(404).json({ message: 'No users found' });
     }
   } catch (error) {
-    console.error('Error fetching top user:', error);
+    console.error('Error fetching user results:', error);
     res.status(500).json({ message: 'Internal server error', error: error.toString() });
   }
 });
