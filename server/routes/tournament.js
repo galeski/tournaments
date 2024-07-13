@@ -36,12 +36,29 @@ router.get("/user", authenticateToken, async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  let collection = await db.collection("tournaments");
-  let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
+  try {
+    let collection = await db.collection("tournaments");
+    let id = req.params.id;
+    let query;
 
-  if (!result) res.send("Not found").status(404);
-  else res.send(result).status(200);
+    // Try to convert to ObjectId, if it fails, use the string version
+    try {
+      query = { _id: new ObjectId(id) };
+    } catch (err) {
+      query = { _id: id };
+    }
+
+    let result = await collection.findOne(query);
+
+    if (!result) {
+      res.status(404).send("Tournament not found");
+    } else {
+      res.status(200).json(result);
+    }
+  } catch (err) {
+    console.error("Error retrieving tournament:", err);
+    res.status(500).send("Error retrieving tournament");
+  }
 });
 
 router.post("/", authenticateToken, async (req, res) => {
