@@ -53,21 +53,44 @@ export default function Scoring() {
       tournamentId: tournament._id,
       scores: Object.values(scores).map(score => `${score.score1}:${score.score2}`)
     };
-
+  
     try {
-      const response = await fetch("http://localhost:5050/score", {
-        method: "POST",
+      // First, check if a score already exists for this tournament
+      const checkResponse = await fetch(`http://localhost:5050/score/${tournament._id}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+  
+      let method, url;
+      if (checkResponse.ok) {
+        // Score exists, use PATCH
+        method = "PATCH";
+        url = `http://localhost:5050/score/${tournament._id}`;
+      } else if (checkResponse.status === 404) {
+        // Score doesn't exist, use POST
+        method = "POST";
+        url = "http://localhost:5050/score";
+      } else {
+        // Unexpected error
+        throw new Error(`Error checking existing score: ${checkResponse.statusText}`);
+      }
+  
+      // Now send the actual score data
+      const submitResponse = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify(scoringData),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  
+      if (!submitResponse.ok) {
+        throw new Error(`HTTP error! status: ${submitResponse.status}`);
       }
-
+  
       // If we reach here, the submission was successful
       navigate("/");
     } catch (error) {

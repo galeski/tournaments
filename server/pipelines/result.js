@@ -5,9 +5,24 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
+    const tournamentId = req.params.id;
+    let tournamentIdObj;
+
+    // Try to convert to ObjectId, if it fails, use the string version
+    try {
+      tournamentIdObj = new ObjectId(tournamentId);
+    } catch (err) {
+      tournamentIdObj = tournamentId;
+    }
+
     const pipeline = [
+      {
+        $match: {
+          tournamentId: tournamentIdObj.toString()
+        }
+      },
       {
         $addFields: {
           tournamentIdObj: { $toObjectId: "$tournamentId" }
@@ -51,8 +66,8 @@ router.get('/', async (req, res) => {
               as: "ans",
               in: {
                 questionIndex: { $toInt: "$$ans.k" },
-                userAnswer: { 
-                  $concat: [
+                userAnswer: {
+                   $concat: [
                     { $toString: "$$ans.v.answer1" },
                     ":",
                     { $toString: "$$ans.v.answer2" }
@@ -78,9 +93,9 @@ router.get('/', async (req, res) => {
         $group: {
           _id: "$user",
           answers: { $push: "$answerDetails" },
-          totalCorrect: { 
-            $sum: { 
-              $reduce: {
+          totalCorrect: {
+             $sum: {
+               $reduce: {
                 input: "$answerDetails",
                 initialValue: 0,
                 in: { $add: ["$$value", { $cond: ["$$this.isCorrect", 1, 0] }] }
@@ -100,7 +115,6 @@ router.get('/', async (req, res) => {
       { $sort: { totalCorrect: -1 } }
     ];
 
-
     // Log the pipeline for debugging
     console.log("Aggregation Pipeline:", JSON.stringify(pipeline, null, 2));
 
@@ -110,8 +124,9 @@ router.get('/', async (req, res) => {
     console.log("Aggregation Result:", JSON.stringify(result, null, 2));
 
     if (result.length > 0) {
-      // Return all user results, sorted by totalCorrect
+      // Return all user results for the specific tournament, sorted by totalCorrect
       res.json({
+        tournamentId: tournamentId,
         userResults: result.map(user => ({
           user: user.user,
           totalCorrect: user.totalCorrect,
@@ -121,12 +136,12 @@ router.get('/', async (req, res) => {
       });
     } else {
       // Log collection counts
-      const answerCount = await db.collection('answers').countDocuments();
-      const tournamentCount = await db.collection('tournaments').countDocuments();
-      const scoreCount = await db.collection('scores').countDocuments();
-      console.log(`Collection counts - Answers: ${answerCount}, Tournaments: ${tournamentCount}, Scores: ${scoreCount}`);
+      const answerCount = await db.collection('answers').countDocuments({ tournamentId: tournamentId });
+      const tournamentCount = await db.collection('tournaments').countDocuments({ _id: tournamentIdObj });
+      const scoreCount = await db.collection('scores').countDocuments({ tournamentId: tournamentId });
+      console.log(`Collection counts for tournament ${tournamentId} - Answers: ${answerCount}, Tournaments: ${tournamentCount}, Scores: ${scoreCount}`);
 
-      res.status(404).json({ message: 'No users found' });
+      res.status(404).json({ message: 'No users found for this tournament' });
     }
   } catch (error) {
     console.error('Error fetching user results:', error);
