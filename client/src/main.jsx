@@ -15,6 +15,7 @@ import Login from "./components/Login";
 import Register from './components/Register';
 import Score from './components/Score';
 import ScoreView from "./components/ScoreView";
+import ResultView from "./components/ResultView";
 import "./index.css";
 
 // ProtectedRoute component
@@ -117,6 +118,16 @@ const router = createBrowserRouter([
       {
         path: "/scores/:id",
         element: <ProtectedRoute><ScoreView /></ProtectedRoute>,
+      },
+    ],
+  },
+  {
+    path: "/result/:id",
+    element: <App />,
+    children: [
+      {
+        path: "/result/:id",
+        element: <ProtectedRoute><ResultView /></ProtectedRoute>,
       },
     ],
   },
