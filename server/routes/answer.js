@@ -25,7 +25,19 @@ router.post("/", async (req, res) => {
       user: req.body.user,
       answer: req.body.answer
     };
+
+    let { tournamentId, user } = newAnswer;
+
     let collection = await db.collection("answers");
+    const answerExists = await collection.findOne({ tournamentId, user });
+
+    console.log(tournamentId, user);
+
+    if (answerExists) {
+      res.status(500).send("User already posted answer");
+      return;
+    }
+
     let result = await collection.insertOne(newAnswer);
     res.send(result).status(204);
   } catch (err) {

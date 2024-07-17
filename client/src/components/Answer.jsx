@@ -72,9 +72,11 @@ const Answer = () => {
         },
         body: JSON.stringify(submissionData),
       });
+
+      const data = await response.text();
   
       if (!response.ok) {
-        throw new Error(`Submission failed: ${response.statusText}`);
+        throw new Error(`Submission failed: ${data || response.statusText}`);
       }
   
       // Set submission success to true
