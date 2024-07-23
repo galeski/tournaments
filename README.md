@@ -5,7 +5,7 @@ WIP - this repo is a work in progress and the readme is outdated
 
 TODO:
 
-Fix the navbar after logon
+Work on deployment
 
 Logon/register curl example
 curl -X POST http://localhost:5050/auth/login \   
